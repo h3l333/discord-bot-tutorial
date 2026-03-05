@@ -13,13 +13,13 @@ module.exports = {
 	async execute(interaction) {
 		const commandName = interaction.options
 			.getString("command", true)
-			.toLowerCase();
+			.toLowerCase(); // Retrieve the inputted command
 		const command = interaction.client.commands.get(commandName);
 		if (!command) {
 			return interaction.reply(
 				`There is no command with name \`${commandName}\`!`,
 			);
-		}
+		} // If the command does not exist, return
 
 		delete require.cache[require.resolve(`./${command.data.name}.js`)];
 

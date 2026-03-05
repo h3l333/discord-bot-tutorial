@@ -3,6 +3,10 @@ const path = require("node:path");
 const fs = require("node:fs");
 require("dotenv").config({ path: "config/.env" });
 
+// The client receives events through a WebSocket gateway, but operations that affect the
+// bot's configuration require HTTP-based communications. So does sending messages and responding to
+// user interactions.
+
 const commands = [];
 
 const commandFoldersPath = path.join(__dirname, "commands");
@@ -24,12 +28,13 @@ for (const folder of commandFolders) {
 			);
 		}
 	}
-}
+} // Dynamically read command handler scripts, extract and load their command definitions
 
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.CLIENT_ID;
 const guildId = process.env.GUILD_ID;
-const rest = new REST();
+const rest = new REST(); // Creates REST client instance capable of making HTTP requests
+// Not a persistent connection. Each REST call is a seperate HTTP request
 rest.setToken(token);
 
 (async () => {
@@ -40,7 +45,7 @@ rest.setToken(token);
 			{
 				body: commands,
 			},
-		);
+		); // Construct the API endpoint path and send a PUT HTTP request
 		console.log("Successfully reloaded commands.");
 	} catch (e) {
 		console.error(e);

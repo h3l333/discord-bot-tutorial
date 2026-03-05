@@ -1,4 +1,4 @@
-const { Events, Collection } = require("discord.js");
+const { Events, Collection, MessageFlags } = require("discord.js");
 const { cooldown } = require("../commands/utility/ping");
 
 module.exports = {
@@ -19,21 +19,24 @@ module.exports = {
 
 		if (!cooldowns.has(command.data.name)) {
 			cooldowns.set(command.data.name, new Collection());
-		}
+		} // If there are no cooldowns logged for a command, create a new collection as the property value
 
 		const now = Date.now();
-		const timestamps = cooldowns.get(command.data.name);
+		const timestamps = cooldowns.get(command.data.name); // Get the timestamps for the called command
 		const defaultCooldownDuration = 3;
 		const cooldownAmount =
 			(command.cooldown ?? defaultCooldownDuration) * 1_000;
 
 		if (timestamps.has(interaction.user.id)) {
+			// If the user has already used the command
 			const expirationTime =
 				timestamps.get(interaction.user.id) + cooldownAmount;
 			if (now < expirationTime) {
-				const expiredTimestamp = Math.round(expirationTime / 1_000);
+				const remainingSeconds = Math.ceil(
+					(expirationTime - Date.now()) / 1000,
+				); // If the expiration time has not yet elapsed, warn the user
 				return interaction.reply({
-					content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
+					content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again in \`${remainingSeconds}\` seconds.`,
 					flags: MessageFlags.Ephemeral,
 				});
 			}
