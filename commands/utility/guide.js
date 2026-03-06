@@ -1,0 +1,31 @@
+const { SlashCommandBuilder } = require("discord.js");
+
+module.exports = {
+	data: new SlashCommandBuilder()
+		.setName("guide")
+		.setDescription("Search the discord.js guide.")
+		.addStringOption((option) =>
+			option
+				.setName("query")
+				.setDescription("Phrase to search for.")
+				.setAutocomplete(true),
+		),
+	async autocomplete(interaction) {
+		const focusedValue = interaction.options.getFocused();
+		const choices = [
+			"Popular Topics: Threads",
+			"Interactions: Replying to slash commands",
+			"Popular Topics: Embed preview",
+		];
+		const filtered = choices.filter((choice) =>
+			choice.startsWith(focusedValue),
+		);
+		await interaction.respond(
+			filtered.map((choice) => ({ name: choice, value: choice })),
+		);
+	},
+	async execute(interaction) {
+		const choice = interaction.options.getString("query");
+		await interaction.reply({ content: `${choice}` });
+	},
+};
